@@ -8,7 +8,8 @@ const textRef = "public/txt/vanasonad.txt";
 const app = express();
 app.set("view engine", "ejs");
 app.use(express.static("public"));
-app.use(bodyparser.urlencoded({extended: false}));
+//kui tuleb vormist ainult text, siis false, muidu true
+app.use(bodyparser.urlencoded({extended: true}));
 
 app.get("/", (req, res)=>{
 	res.render("index");
@@ -78,5 +79,9 @@ app.get("/visitlog", (req, res)=>{
 //Eesti filmi marsruudid
 const eestifilmRouter = require("./routes/eestifilmRoutes");
 app.use("/Eestifilm", eestifilmRouter);
+
+//Galerii fotode üleslaadimine
+const photoupRouter = require("./routes/photoupRoutes");
+app.use("/galleryphotupload", photoupRouter);
 
 app.listen(5100);
