@@ -118,8 +118,4 @@ app.use("/galleryphotupload", photoupRouter);
 const galleryRouter = require("./routes/galleryRoutes");
 app.use("/photogallery", galleryRouter);
 
-//konto loomise marsruudid
-const signupRouter = require("./routes/signupRoutes");
-app.use("/signup", signupRouter);
-
 app.listen(5100);
