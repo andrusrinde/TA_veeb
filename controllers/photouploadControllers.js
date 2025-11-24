@@ -32,10 +32,10 @@ const photouploadPagePost = async (req, res)=>{
 	  console.log(fileName);
 	  await fs.rename(req.file.path, req.file.destination + fileName);
 	  //kontrollin, kas vesimärgi fail on olemas
-		const watermarkSettings = [{
-            input: watermarkFile,
-            gravity: "southeast"
-        }];
+	  const watermarkSettings = [{
+        input: watermarkFile,
+        gravity: "southeast"
+      }];
 		if (!await fs.access(watermarkFile).then(() => true).catch(() => false)) {
              console.log("Vesimärgi faili ei leitud!");
              // Tühjendame seaded, et vesimärki ei proovitaks lisada
@@ -55,7 +55,7 @@ const photouploadPagePost = async (req, res)=>{
 	  conn = await mysql.createConnection(dbConf);
 	  let sqlReq = "INSERT INTO galleryphotos_ta (filename, origname, alttext, privacy, userid) VALUES(?,?,?,?,?)";
 	  //kuna kasutajakontosid veel ei ole, siis määrame userid = 1
-	  const userId = 1;
+	  const userId = req.session.userId;
 	  const [result] = await conn.execute(sqlReq, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userId]);
 	  console.log("Salvestati kirje: " + result.insertId);
 	  res.render("galleryphotoupload");
