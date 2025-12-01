@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const fs = require("fs");
 const bodyparser = require("body-parser");
 const mysql = require("mysql2/promise");
@@ -6,6 +7,7 @@ const session = require("express-session");
 const dateEt = require("./src/dateTimeET");
 const dbInfo = require("../../../../vp2025config");
 const loginCheck = require("./src/checkLogin");
+const pool = require("./src/dbPool");
 const textRef = "public/txt/vanasonad.txt";
 
 const app = express();
@@ -15,6 +17,8 @@ app.use(express.static("public"));
 //kui tuleb vormist ainult text, siis false, muidu true
 app.use(bodyparser.urlencoded({extended: true}));
 
+console.log("Andmebaasiserver: " + process.env.DB_HOST);
+
 const dbConf = {
 	host: dbInfo.configData.host,
 	user: dbInfo.configData.user,
@@ -23,13 +27,14 @@ const dbConf = {
 };
 
 app.get("/", async (req, res)=>{
-	let conn;
+	//let conn;
 	try {
-		conn = await mysql.createConnection(dbConf);
+		//conn = await mysql.createConnection(dbConf);
 		let sqlReq = "SELECT filename, alttext FROM galleryphotos_ta WHERE id=(SELECT MAX(id) FROM galleryphotos_ta WHERE privacy=? AND deleted IS NULL)";
 		const privacy = 3;
-		const [rows, fields] = await conn.execute(sqlReq, [privacy]);
-		console.log(rows);
+		//const [rows, fields] = await conn.execute(sqlReq, [privacy]);
+		const [rows, fields] = await pool.execute(sqlReq, [privacy]);
+		//console.log(rows);
 		let imgAlt = "Avalik foto";
 		if(rows[0].alttext != ""){
 			imgAlt = rows[0].alttext;
@@ -37,15 +42,15 @@ app.get("/", async (req, res)=>{
 		res.render("index", {imgFile: "gallery/normal/" + rows[0].filename, imgAlt: imgAlt});
 	}
 	catch(err){
-		console.log(err);
+		//console.log(err);
 		//res.render("index");
 		res.render("index", {imgFile: "images/otsin_pilte.jpg", imgAlt: "Tunnen end, kui pilti otsiv lammas ..."});
 	}
 	finally {
-		if(conn){
+		/* if(conn){
 			await conn.end();
-			console.log("Andmebaasiühendus suletud!");
-		}
+			//console.log("Andmebaasiühendus suletud!");
+		} */
 	}
 });
 
@@ -73,7 +78,7 @@ app.get("/regvisit", (req, res)=>{
 });
 
 app.post("/regvisit", (req, res)=>{
-	console.log(req.body);
+	//console.log(req.body);
 	fs.open("public/txt/visitlog.txt", "a", (err, file)=>{
 		if(err){
 			throw(err);
@@ -85,7 +90,7 @@ app.post("/regvisit", (req, res)=>{
 					throw(err);
 				}
 				else {
-					console.log("Salvestatud!");
+					//console.log("Salvestatud!");
 					res.render("visitregistered", {visitor: req.body.firstNameInput + " " + req.body.lastNameInput});
 				}
 			});
@@ -112,7 +117,7 @@ app.get("/visitlog", (req, res)=>{
 
 //sisseloginud kasutajate osa avaleht
 app.get("/home", loginCheck.isLogin, (req,res)=>{
-	console.log("Sisse logis kasutaja: " + req.session.userId);
+	//console.log("Sisse logis kasutaja: " + req.session.userId);
 	res.render("home", {user: req.session.firstName + " " + req.session.lastName});
 });
 
@@ -120,7 +125,7 @@ app.get("/home", loginCheck.isLogin, (req,res)=>{
 app.get("/logout", (req,res)=>{
 	//Tühistame sessiooni
 	req.session.destroy();
-	console.log("Välja logitud!");
+	//console.log("Välja logitud!");
 	res.redirect("/");
 });
 

@@ -25,11 +25,11 @@ const photouploadPage = (req, res)=>{
 
 const photouploadPagePost = async (req, res)=>{
 	let conn;
-	console.log(req.body);
-	console.log(req.file);
+	//console.log(req.body);
+	//console.log(req.file);
 	try {
 	  const fileName = "vp_" + Date.now() + ".jpg";
-	  console.log(fileName);
+	  //console.log(fileName);
 	  await fs.rename(req.file.path, req.file.destination + fileName);
 	  //kontrollin, kas vesimärgi fail on olemas
 	  const watermarkSettings = [{
@@ -37,15 +37,15 @@ const photouploadPagePost = async (req, res)=>{
         gravity: "southeast"
       }];
 		if (!await fs.access(watermarkFile).then(() => true).catch(() => false)) {
-             console.log("Vesimärgi faili ei leitud!");
+             //console.log("Vesimärgi faili ei leitud!");
              // Tühjendame seaded, et vesimärki ei proovitaks lisada
              watermarkSettings.length = 0; 
         }
-		console.log("Muudan suurust: 800X600");
+		//console.log("Muudan suurust: 800X600");
 		//loon normaalmõõdus foto (800X600)
 		//await sharp(req.file.destination + fileName).resize(800,600).jpeg({quality: 90}).toFile("./public/gallery/normal/" + fileName);
 		 let normalImageProcessor = await sharp(req.file.destination + fileName).resize(800, 600).jpeg({quality: 90});
-        console.log("Lisan vesimärgi" + watermarkSettings.length);    
+        //console.log("Lisan vesimärgi" + watermarkSettings.length);    
         if (watermarkSettings.length > 0) {
             normalImageProcessor = await normalImageProcessor.composite(watermarkSettings);
         }
@@ -57,7 +57,7 @@ const photouploadPagePost = async (req, res)=>{
 	  //kuna kasutajakontosid veel ei ole, siis määrame userid = 1
 	  const userId = req.session.userId;
 	  const [result] = await conn.execute(sqlReq, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userId]);
-	  console.log("Salvestati kirje: " + result.insertId);
+	  //console.log("Salvestati kirje: " + result.insertId);
 	  res.render("galleryphotoupload");
 	}
 	catch(err) {
@@ -67,7 +67,7 @@ const photouploadPagePost = async (req, res)=>{
 	finally {
 	  if(conn){
 	  await conn.end();
-	    console.log("Andmebaasiühendus on suletud!");
+	    //console.log("Andmebaasiühendus on suletud!");
 	  }
 	}
 };

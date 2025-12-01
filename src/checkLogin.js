@@ -4,7 +4,7 @@ exports.isLogin = function(req, res, next){
 			console.log("Sees on kasutaja: " + req.session.userId);
 			next();
 		} else {
-			console.log("Sisselogimist pole tuvastatud!");
+			console.log("Sessioonimuutujat pole!");
 			return res.redirect("/signin");
 		}
 	} else {
